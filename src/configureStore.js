@@ -5,10 +5,15 @@ import createReducer from './reducers';
 import { rootEpic } from './epics';
 
 export default function configureStore(initialState = {}, history) {
-  let composeEnhancers = compose;
-
+  const composeEnhancers = compose;
   const epicMiddleware = createEpicMiddleware();
   const middlewares = [epicMiddleware, routerMiddleware(history)];
+  if (process.env.NODE_ENV === 'development') {
+    const { createLogger } = require('redux-logger');
+  
+    middlewares.push(createLogger({ collapsed: true }));
+  }
+  
   const enhancers = [applyMiddleware(...middlewares)];
 
   const store = createStore(
